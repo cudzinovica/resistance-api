@@ -52,7 +52,7 @@ exports.updateTodo = async function(req, res, next){
 
     try{
         var updatedTodo = await TodoService.updateTodo(todo)
-        return res.status(200).json({status: 200, data: updatedTodo, message: "Succesfully Updated Tod"})
+        return res.status(200).json({status: 200, data: updatedTodo, message: "Succesfully Updated Todo"})
     }catch(e){
         return res.status(400).json({status: 400., message: e.message})
     }
