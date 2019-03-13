@@ -70,7 +70,6 @@ exports.createPlayer = async function(gameId, player){
     try{
         var savedPlayer = await newPlayer.save();
 
-        // oldGame.players.push(newPlayer);
         oldGame.players = oldGame.players.concat([newPlayer]);
         var savedGame = await oldGame.save();
 
@@ -131,6 +130,9 @@ exports.deletePlayer = async function(gameId, id){
         if(deleted.result.n === 0){
             throw Error("Player Could not be deleted")
         }
+        
+        var savedGame = await Game.findOneAndUpdate(gameId, {$pull: {players: id}});
+
         return deleted
     }catch(e){
         throw Error("Error Occured while Deleting the Player: " + e.message)
