@@ -1,15 +1,10 @@
-# todo-api
-A simple todo API made with NodeJS, ExpressJS and MongoDB. Can be used as a back-end for learning front-end technologies without making a standalone API for that purpose.
-
-
-## Download Instruction
-
-Run `git clone https://github.com/nomanHasan/todo-api` to download the project to your computer.
+# resistance-api
+API for the resistance made with NodeJS, ExpressJS and MongoDB. Has CRUD functionality for interacting with game and player objects.
 
 
 ## Database Setup
 
-Download and isntall MogoDB.
+Download and install MogoDB.
 Make sure that the database is running at `127.0.0.1:27017`
 
 
