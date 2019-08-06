@@ -33,7 +33,7 @@ exports.createGame = async function(){
     var newGame = new Game({
         phase: GamePhaseEnum.lobby,
         players: [],
-        missionResults: [false, false, false, false, false],
+        missionResults: [],
         failedVotes: 0,
         currentRound: 0
     })
@@ -59,22 +59,20 @@ exports.updateGame = async function(game){
         return false;
     }
 
-    console.log(oldGame)
+    console.log(game)
 
-    oldGame.phase = game.phase ? game.phase : oldGame.phase
-    oldGame.players = game.players ? game.players : oldGame.players
-    oldGame.missionResults = game.missionResults ? game.missionResults : oldGame.missionResults
-    oldGame.failedVotes = game.failedVotes ? game.failedVotes : oldGame.failedVotes
-    oldGame.currentRound = game.currentRound ? game.currentRound : oldGame.currentRound
-    oldGame.currentLeader = game.currentLeader ? game.currentLeader : oldGame.currentLeader
-
-    console.log(oldGame)
+    if (game.phase != null) { oldGame.phase = game.phase; }
+    if (game.players != null) { oldGame.players = game.players; }
+    if (game.missionResults != null) { oldGame.missionResults = game.missionResults; }
+    if (game.failedVotes != null) { oldGame.failedVotes = game.failedVotes; }
+    if (game.currentRound != null) { oldGame.currentRound = game.currentRound; }
+    if (game.currentLeader != null) { oldGame.currentLeader = game.currentLeader; }
 
     try{
         var savedGame = await oldGame.save()
         return savedGame;
     }catch(e){
-        throw Error("And Error occured while updating the Game: " + e.message);
+        throw Error("An Error occured while updating the Game: " + e.message);
     }
 }
 

@@ -99,15 +99,9 @@ exports.updatePlayer = async function(gameId, player){
         return false;
     }
 
-    console.log(oldPlayer)
-
-    oldPlayer.name = player.name ? player.name : oldPlayer.name
-    oldPlayer.loyalty = player.loyalty ? player.loyalty : oldPlayer.loyalty
-    oldPlayer.character = player.character ? player.character : oldPlayer.character
-    oldPlayer.isLeader = player.isLeader ? player.isLeader : oldPlayer.isLeader
-
-
-    console.log(oldPlayer)
+    if (player.name != null) { oldPlayer.name = player.name; }
+    if (player.loyalty != null) { oldPlayer.loyalty = player.loyalty; }
+    if (player.character != null) { oldPlayer.character = player.character; }
 
     try{
         var savedPlayer = await oldPlayer.save()

@@ -27,6 +27,11 @@ exports.startGame = async function(req, res, next) {
             return res.status(400).json({status: 400, message: "Need between 5 to 10 players to start game!"});
         }
 
+        // reset game properties
+        game.missionResults = [];
+        game.failedVotes = 0;
+        game.currentRound = 0;
+
         // assign players' loyalties
         let numGood = Math.ceil(numPlayers / 3)
         for (var i = 0; i < game.players.length; i++) {
@@ -57,6 +62,25 @@ exports.startGame = async function(req, res, next) {
     } catch(e) {
         return res.status(500).json({status: 500, message: e.message});
     }
+}
 
+
+exports.endGame = async function(req, res, next) {
+    const gameId = req.params.gameId;
+    const playerId = req.params.playerId;
     
+    try {
+        const game = await GameService.getGame(gameId);
+
+        // set game phase to lobby
+        game.phase = GamePhaseEnum.lobby;
+
+        // update game
+        let updatedGame = await GameService.updateGame(game);
+
+        return res.status(200).json({status: 200, data: updatedGame, message: "Game has returned to lobby"});
+
+    } catch(e) {
+        return res.status(500).json({status: 500, message: e.message});
+    }
 }
