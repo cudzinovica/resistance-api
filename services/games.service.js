@@ -66,7 +66,7 @@ exports.updateGame = async function(game){
     oldGame.missionResults = game.missionResults ? game.missionResults : oldGame.missionResults
     oldGame.failedVotes = game.failedVotes ? game.failedVotes : oldGame.failedVotes
     oldGame.currentRound = game.currentRound ? game.currentRound : oldGame.currentRound
-
+    oldGame.currentLeader = game.currentLeader ? game.currentLeader : oldGame.currentLeader
 
     console.log(oldGame)
 
