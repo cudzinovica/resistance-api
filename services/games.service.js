@@ -6,24 +6,25 @@ _this = this
 
 exports.getGames = async function(query, page, limit){
     var options = {
-        page,
-        limit
+        page: page,
+        limit: limit,
+        populate: 'players'
     }
     try {
-        var games = await Game.paginate(query, options)
+        var games = await Game.paginate(query, options);
         return games;
     } catch (e) {
-        throw Error('Error while Paginating Games')
+        throw Error('Error while Paginating Games: ' + e.message)
     }
 }
 
 exports.getGame = async function(id){
 
     try {
-        var game = await Game.findById(id)
+        var game = await Game.findById(id).populate('players');
         return game;
     } catch (e) {
-        throw Error('Error while Finding Game')
+        throw Error('Error while Finding Game: ' + e.message)
     }
 }
 
@@ -41,7 +42,7 @@ exports.createGame = async function(){
         var savedGame = await newGame.save()
         return savedGame;
     }catch(e){
-        throw Error("Error while Creating Game")
+        throw Error("Error while Creating Game: " + e.message)
     }
 }
 
@@ -49,9 +50,9 @@ exports.updateGame = async function(game){
     var id = game.id
 
     try{
-        var oldGame = await Game.findById(id);
+        var oldGame = await Game.findById(id).populate('players');
     }catch(e){
-        throw Error("Error occured while Finding the Game")
+        throw Error("Error occured while Finding the Game: " + e.message)
     }
 
     if(!oldGame){
@@ -73,7 +74,7 @@ exports.updateGame = async function(game){
         var savedGame = await oldGame.save()
         return savedGame;
     }catch(e){
-        throw Error("And Error occured while updating the Game");
+        throw Error("And Error occured while updating the Game: " + e.message);
     }
 }
 
@@ -86,6 +87,6 @@ exports.deleteGame = async function(id){
         }
         return deleted
     }catch(e){
-        throw Error("Error Occured while Deleting the Game")
+        throw Error("Error Occured while Deleting the Game: " + e.message)
     }
 }
