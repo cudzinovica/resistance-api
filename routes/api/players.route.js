@@ -1,6 +1,9 @@
 var express = require('express')
 
 var router = express.Router({ mergeParams: true })
+var gameActions = require('./gameActions.route')
+
+router.use('/:playerId/gameActions', gameActions);
 
 var PlayerController = require('../../controllers/players.controller');
 
