@@ -43,11 +43,7 @@ exports.createGame = async function(req, res, next){
 
 exports.updateGame = async function(req, res, next){
 
-    if(!req.body._id){
-        return res.status(400).json({status: 400., message: "Id must be present"})
-    }
-
-    var id = req.body._id;
+    var id = req.params.id;
 
     console.log(req.body)
 
