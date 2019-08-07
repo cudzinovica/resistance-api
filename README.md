@@ -17,8 +17,9 @@ Run `npm install -g nodemon` to install Nodemon Globally.
 Run `npm start` to run the NodeJS Server.
 
 ## TODOs
-* fix get games returns just list of games
 * Convert to ES6
+* Submit Vote
+* Submit Quest
 * robustness when player leaves during a game
 
 ## API Documentation
@@ -29,7 +30,7 @@ Run `npm start` to run the NodeJS Server.
     * Response Body: `<Game Object>`
   * Get Games - GET /api/games
     * Request Body: none
-    * Response Body: [`<Game Object>`]
+    * Response Body: MongoDBPaginated([`<Game Object>`])
   * Get Game - GET /api/games/{game_id}
     * Request Body: none
     * Response Body: `<Game Object>`
