@@ -42,6 +42,10 @@ Run `npm start` to run the NodeJS Server.
 * Player starts game
   * Start Game
 
+**Setup Phase**
+* Player submits setup
+  * Submit Setup
+
 **Player in Game**
 * Player end game
   * End Game
