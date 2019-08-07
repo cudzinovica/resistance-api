@@ -17,17 +17,83 @@ Run `npm install -g nodemon` to install Nodemon Globally.
 Run `npm start` to run the NodeJS Server.
 
 ## TODOs
-
-* make functionality section api documentation section
+* fix get games returns just list of games
 * Convert to ES6
 * robustness when player leaves during a game
 
-## Functionality
+## API Documentation
 
-* CRUD Games
-* CRUD Players
-* Start Game
-* End Game
+* Games
+  * Create Game - POST /api/games
+    * Request Body: none
+    * Response Body: `<Game Object>`
+  * Get Games - GET /api/games
+    * Request Body: none
+    * Response Body: [`<Game Object>`]
+  * Get Game - GET /api/games/{game_id}
+    * Request Body: none
+    * Response Body: `<Game Object>`
+  * Update Game - PUT /api/games/{game_id}
+    * Request Body:
+    ```
+    {
+        <game attribute key>: <game attribute val>
+    }
+    ```
+  * Delete Game - DELETE /api/games/{game_id}
+    * Request Body: none
+    * Response Body: none
+* Players
+  * Create Player - POST /api/games/{game_id}/players
+    * Request Body: none
+    * Response Body: `<Player Object>`
+  * Get Players - GET /api/games/{game_id}/players
+    * Request Body: none
+    * Response Body: [`<Player Object>`]
+  * Get Player - GET /api/games/{game_id}/players/{player_id}
+    * Request Body: none
+    * Response Body: `<Player Object>`
+  * Update Player - PUT /api/games/{game_id}/players/{player_id}
+    * Request Body:
+    ```
+    {
+        <game attribute key>: <game attribute val>
+    }
+    ```
+  * Delete Player - DELETE /api/games/{game_id}/players/{player_id}
+    * Request Body: none
+    * Response Body: none
+* Game Actions
+  * Start Game - POST /api/games/{game_id}/players/{player_id}/gameActions/startGame
+    * Request Body: none
+    * Response Body: `<Game Object>`
+  * End Game - POST /api/games/{game_id}/players/{player_id}/gameActions/endGame
+    * Request Body: none
+    * Response Body: `<Game Object>`
+  * Submit Selection - POST /api/games/{game_id}/players/{player_id}/gameActions/submitSelection
+    * Request Body: 
+    ```
+    {
+        "selection": [<Player Id>]
+    }
+    ```
+    * Response Body: `<Game Object>`
+  * Submit Vote - POST /api/games/{game_id}/players/{player_id}/gameActions/submitVote
+    * Request Body: 
+    ```
+    {
+        "vote": <Boolean>
+    }
+    ```
+    * Response Body: `<Game Object>`
+  * Submit Quest - POST /api/games/{game_id}/players/{player_id}/gameActions/submitQuest
+    * Request Body: 
+    ```
+    {
+        "quest": <Boolean>
+    }
+    ```
+    * Response Body: `<Game Object>`
 
 ## Play flow
 
