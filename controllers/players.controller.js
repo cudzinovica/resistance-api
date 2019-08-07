@@ -59,8 +59,7 @@ exports.updatePlayer = async function(req, res, next){
         id,
         name: req.body.name,
         loyalty: req.body.loyalty,
-        character: req.body.character,
-        isLeader: req.body.isLeader
+        character: req.body.character
     }
 
     try{

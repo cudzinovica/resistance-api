@@ -33,16 +33,16 @@ exports.startGame = async function(req, res, next) {
         game.currentRound = 0;
 
         // assign players' loyalties
-        let numGood = Math.ceil(numPlayers / 3)
+        let numEvil = Math.ceil(numPlayers / 3)
         for (var i = 0; i < game.players.length; i++) {
             let player = game.players[i];
             const rand = Math.floor(Math.random() * numPlayers);
 
-            if( rand < numGood ) {
-                player.loyalty = LoyaltyEnum.good;
-                numGood--;
-            } else {
+            if( rand < numEvil ) {
                 player.loyalty = LoyaltyEnum.evil;
+                numEvil--;
+            } else {
+                player.loyalty = LoyaltyEnum.good;
             }
             numPlayers--;
         }
