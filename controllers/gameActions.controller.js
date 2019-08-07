@@ -17,14 +17,14 @@ exports.startGame = async function(req, res, next) {
 
         // check in lobby phase
         if (game.phase != GamePhaseEnum.lobby) {
-            return res.status(400).json({status: 400, message: "Only allowed to start game from lobby!"});
+            return res.status(400).json("Only allowed to start game from lobby!");
         }
 
         // check 5-10 players
         let numPlayers = game.players.length;
 
         if (numPlayers < 5 || numPlayers > 10) {
-            return res.status(400).json({status: 400, message: "Need between 5 to 10 players to start game!"});
+            return res.status(400).json("Need between 5 to 10 players to start game!");
         }
 
         // reset game properties
@@ -57,10 +57,10 @@ exports.startGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        return res.status(200).json({status: 200, data: updatedGame, message: "Game has started"});
+        return res.status(200).json(updatedGame);
 
     } catch(e) {
-        return res.status(500).json({status: 500, message: e.message});
+        return res.status(500).json(e.message);
     }
 }
 
@@ -78,9 +78,9 @@ exports.endGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        return res.status(200).json({status: 200, data: updatedGame, message: "Game has returned to lobby"});
+        return res.status(200).json(updatedGame);
 
     } catch(e) {
-        return res.status(500).json({status: 500, message: e.message});
+        return res.status(500).json(e.message);
     }
 }

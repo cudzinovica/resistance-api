@@ -16,22 +16,21 @@ exports.getPlayers = async function(req, res, next){
 
     try{
         var players = await PlayerService.getPlayers(gameId, {}, page, limit)
-        return res.status(200).json({status: 200, data: players, message: "Succesfully Players Recieved"});
+        return res.status(200).json(players);
     }catch(e){
-        return res.status(400).json({status: 400, message: e.message});
+        return res.status(500).json(e.message);
     }
 }
 
 exports.getPlayer = async function(req, res, next){
     var gameId = req.params.gameId;
-
     var id = req.params.id;
 
     try{
         var player = await PlayerService.getPlayer(gameId, id)
-        return res.status(200).json({status: 200, data: player, message: "Succesfully Player Recieved"});
+        return res.status(200).json(player);
     }catch(e){
-        return res.status(400).json({status: 400, message: e.message});
+        return res.status(500).json(e.message);
     }
 }
 
@@ -44,16 +43,14 @@ exports.createPlayer = async function(req, res, next){
 
     try{
         var createdPlayer = await PlayerService.createPlayer(gameId, player)
-        return res.status(201).json({status: 201, data: createdPlayer, message: "Succesfully Created Player"})
+        return res.status(201).json(createdPlayer)
     }catch(e){
-        return res.status(400).json({status: 400, message: e.message});
+        return res.status(500).json(e.message);
     }
 }
 
 exports.updatePlayer = async function(req, res, next){
     var gameId = req.params.gameId;
-
-    
     var id = req.params.id;
 
     console.log(req.body)
@@ -68,22 +65,21 @@ exports.updatePlayer = async function(req, res, next){
 
     try{
         var updatedPlayer = await PlayerService.updatePlayer(gameId, player)
-        return res.status(200).json({status: 200, data: updatedPlayer, message: "Succesfully Updated Player"})
+        return res.status(200).json(updatedPlayer)
     }catch(e){
-        return res.status(400).json({status: 400., message: e.message})
+        return res.status(500).json(e.message)
     }
 }
 
 exports.removePlayer = async function(req, res, next){
     var gameId = req.params.gameId;
-
     var id = req.params.id;
 
     try{
         var deleted = await PlayerService.deletePlayer(gameId, id)
-        return res.status(204).json({status:204, message: "Succesfully Player Deleted"})
+        return res.status(204).json()
     }catch(e){
-        return res.status(400).json({status: 400, message: e.message})
+        return res.status(500).json(e.message)
     }
 
 }
