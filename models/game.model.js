@@ -10,7 +10,8 @@ const GameSchema = Schema({
     currentLeader: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
     missionResults: [Boolean],
     failedVotes: Number,
-    currentRound: Number
+    currentRound: Number,
+    currentTeam: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }]
 })
 
 GameSchema.plugin(mongoosePaginate)

@@ -7,6 +7,15 @@ var GamePhaseEnum = require('../enums/gamePhase.enum');
 
 _this = this;
 
+teamSizeMap = {
+    5: [2,3,2,3,3],
+    6: [2,3,4,3,4],
+    7: [2,3,3,4,4],
+    8: [3,4,4,5,5],
+    9: [3,4,4,5,5],
+    10: [3,4,4,5,5]
+}
+
 
 exports.startGame = async function(req, res, next) {
     const gameId = req.params.gameId;
@@ -83,4 +92,56 @@ exports.endGame = async function(req, res, next) {
     } catch(e) {
         return res.status(500).json(e.message);
     }
+}
+
+exports.submitSelection = async function(req, res, next) {
+    const gameId = req.params.gameId;
+    const playerId = req.params.playerId;
+
+    try {
+        const game = await GameService.getGame(gameId);
+
+        // confirm in selection phase
+        if (game.phase != GamePhaseEnum.selection) {
+            return res.status(400).json("Must be in selection phase");
+        }
+
+        // confirm player is leader
+        if (game.currentLeader != playerId ) {
+            return res.status(400).json("Must be leader to submit selection")
+        }
+
+        // confirm num submitted players is correct
+        const selection = req.body.selection;
+        const requiredTeamSize = teamSizeMap[game.players.length][game.currentRound];
+        console.log(selection);
+        console.log(requiredTeamSize);
+        console.log(selection.length)
+        if (selection.length != requiredTeamSize) {
+            return res.status(400).json(`Team selection must be ${requiredTeamSize} players large`)
+        }
+
+        // set submitted players as current team
+        game.currentTeam = selection;
+
+        // update phase to vote phase
+        game.phase = GamePhaseEnum.vote;
+
+        // update game
+        let updatedGame = await GameService.updateGame(game);
+
+        return res.status(200).json(updatedGame);
+
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
+}
+
+exports.submitVote = async function(req, res, next) {
+    return res.status(405).json();
+}
+
+exports.submitQuest = async function(req, res, next) {
+    // if 4th quest and 7 or more players, two fails required to fail quest
+    return res.status(405).json();
 }

@@ -19,7 +19,6 @@ exports.getGames = async function(query, page, limit){
 }
 
 exports.getGame = async function(id){
-
     try {
         var game = await Game.findById(id).populate('players');
         return game;
@@ -35,7 +34,9 @@ exports.createGame = async function(){
         players: [],
         missionResults: [],
         failedVotes: 0,
-        currentRound: 0
+        currentRound: 0,
+        currentLeader: null,
+        currentTeam: []
     })
 
     try{
@@ -67,6 +68,7 @@ exports.updateGame = async function(game){
     if (game.failedVotes != null) { oldGame.failedVotes = game.failedVotes; }
     if (game.currentRound != null) { oldGame.currentRound = game.currentRound; }
     if (game.currentLeader != null) { oldGame.currentLeader = game.currentLeader; }
+    if (game.currentTeam != null) { oldGame.currentTeam = game.currentTeam; }
 
     try{
         var savedGame = await oldGame.save()
