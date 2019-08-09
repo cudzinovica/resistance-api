@@ -17,7 +17,6 @@ Run `npm install -g nodemon` to install Nodemon Globally.
 Run `npm start` to run the NodeJS Server.
 
 ## TODOs
-* Convert to ES6
 * Submit Vote
 * Submit Quest
 * robustness when player leaves during a game
