@@ -8,7 +8,6 @@ _this = this
 
 
 getGame = async function(gameId) {
-
     try{
         var oldGame = await Game.findById(gameId).populate('players')
     }catch(e){
@@ -21,7 +20,6 @@ getGame = async function(gameId) {
 }
 
 exports.getPlayers = async function(gameId, query, page, limit){
-
     oldGame = await getGame(gameId)
 
     if( !oldGame ){
@@ -37,13 +35,6 @@ exports.getPlayers = async function(gameId, query, page, limit){
 }
 
 exports.getPlayer = async function(gameId, id){
-
-    oldGame = await getGame(gameId)
-
-    if( !oldGame ){
-        return false
-    }
-
     try {
         var player = await Player.findById(id)
         return player;
@@ -53,7 +44,6 @@ exports.getPlayer = async function(gameId, id){
 }
 
 exports.createPlayer = async function(gameId, player){
-
     oldGame = await getGame(gameId)
 
     if( !oldGame ){
@@ -64,7 +54,8 @@ exports.createPlayer = async function(gameId, player){
         name: player.name,
         loyalty: false,
         character: 0,
-        isLeader: false
+        currentVote: false,
+        hasVoted: false
     })
 
     try{
@@ -80,31 +71,8 @@ exports.createPlayer = async function(gameId, player){
 }
 
 exports.updatePlayer = async function(gameId, player){
-
-    oldGame = await getGame(gameId)
-
-    if( !oldGame ){
-        return false
-    }
-    
-    var id = player.id
-
     try{
-        var oldPlayer = await Player.findById(id);
-    }catch(e){
-        throw Error("Error occured while Finding the Player: " + e.message)
-    }
-
-    if(!oldPlayer){
-        return false;
-    }
-
-    if (player.name != null) { oldPlayer.name = player.name; }
-    if (player.loyalty != null) { oldPlayer.loyalty = player.loyalty; }
-    if (player.character != null) { oldPlayer.character = player.character; }
-
-    try{
-        var savedPlayer = await oldPlayer.save()
+        var savedPlayer = await player.save()
         return savedPlayer;
     }catch(e){
         throw Error("And Error occured while updating the Player: " + e.message);
@@ -112,20 +80,13 @@ exports.updatePlayer = async function(gameId, player){
 }
 
 exports.deletePlayer = async function(gameId, id){
-
-    oldGame = await getGame(gameId)
-
-    if( !oldGame ){
-        return false
-    }
-    
     try{
-        var deleted = await Player.remove({_id: id})
+        let deleted = await Player.deleteOne({_id: id})
         if(deleted.result.n === 0){
             throw Error("Player Could not be deleted")
         }
         
-        var savedGame = await Game.findOneAndUpdate(gameId, {$pull: {players: id}});
+        let savedGame = await Game.findOneAndUpdate(gameId, {$pull: {players: id}});
 
         return deleted
     }catch(e){

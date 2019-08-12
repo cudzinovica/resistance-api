@@ -42,19 +42,8 @@ exports.createGame = async function(req, res, next){
 }
 
 exports.updateGame = async function(req, res, next){
-
-    var id = req.params.id;
-
-    console.log(req.body)
-
-    var game = {
-        id,
-        phase: req.body.phase,
-        players: req.body.players,
-        missionResults: req.body.missionResults,
-        failedVotes: req.body.failedVotes,
-        currentRound: req.body.currentRound
-    }
+    var game = req.body.game;
+    game.id = req.params.id;
 
     try{
         var updatedGame = await GameService.updateGame(game)

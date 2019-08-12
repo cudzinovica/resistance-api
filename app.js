@@ -15,10 +15,11 @@ var bluebird = require('bluebird')
 var app = express();
 
 var mongoose = require('mongoose')
+var dbName = 'resistance'
 mongoose.Promise = bluebird
-mongoose.connect('mongodb://127.0.0.1:27017/resistance', { useNewUrlParser: true })
-.then(()=> { console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/resistance`)})
-.catch(()=> { console.log(`Error Connecting to the Mongodb Database at URL : mongodb://127.0.0.1:27017/resistance`)})
+mongoose.connect(`mongodb://127.0.0.1:27017/${dbName}`, { useNewUrlParser: true })
+.then(()=> { console.log(`Succesfully Connected to the Mongodb Database  at URL : mongodb://127.0.0.1:27017/${dbName}`)})
+.catch(()=> { console.log(`Error Connecting to the Mongodb Database at URL : mongodb://127.0.0.1:27017/${dbName}`)})
 
 
 app.use(function(req, res, next) {

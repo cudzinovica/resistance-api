@@ -3,7 +3,7 @@ var GamePhaseEnum = {
   "setup": 1,
   "selection": 2,
   "vote": 3,
-  "mission": 4,
+  "quest": 4,
   "assassin": 5
 }
 

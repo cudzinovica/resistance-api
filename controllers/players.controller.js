@@ -51,16 +51,9 @@ exports.createPlayer = async function(req, res, next){
 
 exports.updatePlayer = async function(req, res, next){
     var gameId = req.params.gameId;
-    var id = req.params.id;
 
-    console.log(req.body)
-
-    var player = {
-        id,
-        name: req.body.name,
-        loyalty: req.body.loyalty,
-        character: req.body.character
-    }
+    var player = req.body.player;
+    player.id = req.params.id;
 
     try{
         var updatedPlayer = await PlayerService.updatePlayer(gameId, player)

@@ -138,10 +138,65 @@ exports.submitSelection = async function(req, res, next) {
 }
 
 exports.submitVote = async function(req, res, next) {
-    return res.status(405).json();
+    const gameId = req.params.gameId;
+    const playerId = req.params.playerId;
+
+    try {
+        let game = await GameService.getGame(gameId);
+
+        // confirm in vote phase
+        if (game.phase != GamePhaseEnum.vote) {
+            return res.status(400).json("Must be in vote phase");
+        }
+
+        // update player's vote and set hasVoted to true
+        let currPlayer = await PlayerService.getPlayer(gameId, playerId);
+
+        const playerVote = req.body.vote;
+
+        currPlayer.currentVote = playerVote;
+        currPlayer.hasVoted = true;
+
+        var updatedPlayer = await PlayerService.updatePlayer(gameId, currPlayer);
+
+        game = await GameService.getGame(gameId);
+
+        // if all players have voted:
+        if (game.players.every(player => { return player.hasVoted })){
+            // set everyone's hasVoted to false
+            game.players.forEach(player => { player.hasVoted = false; });
+
+            // if majority voted yes
+                // set failed vote counter to 0
+                // update game phase to quest phase
+            // else
+                // increase failed Vote counter
+                // if failed votes is 5 or greater
+                    // set evil as winner
+                    // update game phase to lobby
+                // set current leader to next player
+                // set phase to selection phase
+            game.phase = GamePhaseEnum.quest;
+
+            game = await GameService.updateGame(game);
+        }
+
+        return res.status(200).json(game);
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
 }
 
 exports.submitQuest = async function(req, res, next) {
     // if 4th quest and 7 or more players, two fails required to fail quest
     return res.status(405).json();
+
+    // const gameId = req.params.gameId;
+    // const playerId = req.params.playerId;
+
+    // try {
+        // return res.status(200).json(updatedGame);
+    // } catch(e) {
+    //     return res.status(500).json(e.message);
+    // }
 }
