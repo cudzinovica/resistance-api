@@ -16,9 +16,19 @@
         },
         {
             "type": "node",
-            "request": "launch",
+            "request": "launch",    
             "name": "Launch Program",
-            "program": "${workspaceRoot}\\bin\\www"
-        }
+            "runtimeExecutable": "node",
+            "program": "${workspaceRoot}\\bin\\www",
+            "restart": true
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Node: Nodemon",
+            "processId": "${command:PickProcess}",
+            "restart": true,
+            "protocol": "inspector",
+        },
     ]
 }
