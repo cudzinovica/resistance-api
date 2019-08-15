@@ -37,9 +37,7 @@ exports.getPlayer = async function(req, res, next){
 exports.createPlayer = async function(req, res, next){
     var gameId = req.params.gameId;
 
-    var player = {
-        name: req.body.name
-    }
+    var player = req.body.player;
 
     try{
         var createdPlayer = await PlayerService.createPlayer(gameId, player)
@@ -50,13 +48,11 @@ exports.createPlayer = async function(req, res, next){
 }
 
 exports.updatePlayer = async function(req, res, next){
-    var gameId = req.params.gameId;
-
-    var player = req.body.player;
+    let player = req.body.player;
     player.id = req.params.id;
-
+    
     try{
-        var updatedPlayer = await PlayerService.updatePlayer(gameId, player)
+        var updatedPlayer = await PlayerService.updatePlayer(player)
         return res.status(200).json(updatedPlayer)
     }catch(e){
         return res.status(500).json(e.message)

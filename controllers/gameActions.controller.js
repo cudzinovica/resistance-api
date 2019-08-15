@@ -14,7 +14,8 @@ teamSizeMap = {
     8: [3,4,4,5,5],
     9: [3,4,4,5,5],
     10: [3,4,4,5,5]
-}
+};
+FAILED_VOTES_TO_LOSE = 5;
 
 
 exports.startGame = async function(req, res, next) {
@@ -57,8 +58,7 @@ exports.startGame = async function(req, res, next) {
         }
         
         // update one random player to leader
-        let randPlayer = game.players[Math.floor(Math.random()*game.players.length)];
-        game.currentLeader = randPlayer;
+        game.currentLeaderIdx = Math.floor(Math.random()*game.players.length);
 
         // update game phase to selection
         game.phase = GamePhaseEnum.selection;
@@ -79,7 +79,11 @@ exports.endGame = async function(req, res, next) {
     const playerId = req.params.playerId;
     
     try {
-        const game = await GameService.getGame(gameId);
+        let game = await GameService.getGame(gameId);
+
+        if (!game) {
+            return res.status(400).json("Game does not exist");
+        }
 
         // set game phase to lobby
         game.phase = GamePhaseEnum.lobby;
@@ -107,7 +111,7 @@ exports.submitSelection = async function(req, res, next) {
         }
 
         // confirm player is leader
-        if (game.currentLeader != playerId ) {
+        if (game.players[game.currentLeaderIdx].id != playerId ) {
             return res.status(400).json("Must be leader to submit selection")
         }
 
@@ -157,31 +161,49 @@ exports.submitVote = async function(req, res, next) {
         currPlayer.currentVote = playerVote;
         currPlayer.hasVoted = true;
 
-        var updatedPlayer = await PlayerService.updatePlayer(gameId, currPlayer);
+        var updatedPlayer = await PlayerService.updatePlayer(currPlayer);
 
         game = await GameService.getGame(gameId);
 
         // if all players have voted:
-        if (game.players.every(player => { return player.hasVoted })){
+        let numVotedYes = 0;
+        if (game.players.every(player => { if (player.currentVote) numVotedYes++; return player.hasVoted })){
             // set everyone's hasVoted to false
             game.players.forEach(player => { player.hasVoted = false; });
 
             // if majority voted yes
+            if (numVotedYes > game.players.length / 2){
                 // set failed vote counter to 0
+                game.failedVotes = 0;
+
                 // update game phase to quest phase
+                game.phase = GamePhaseEnum.quest;
+            } 
             // else
+            else {
                 // increase failed Vote counter
                 // if failed votes is 5 or greater
+                if (++game.failedVotes >= FAILED_VOTES_TO_LOSE) {
                     // set evil as winner
+                    game.winningTeam = LoyaltyEnum.evil;
+
                     // update game phase to lobby
-                // set current leader to next player
-                // set phase to selection phase
-            game.phase = GamePhaseEnum.quest;
+                    game.phase = GamePhaseEnum.lobby;
+                }
+                // else
+                else {
+                    // set current leader to next player
+                    game.currentLeaderIdx = (game.currentLeaderIdx + 1) % game.players.length;
 
-            game = await GameService.updateGame(game);
+                    // set phase to selection phase
+                    game.phase = GamePhaseEnum.selection;
+                }
+            }
         }
+        
+        const savedGame = await GameService.updateGame(game);
 
-        return res.status(200).json(game);
+        return res.status(200).json(savedGame);
     } catch(e) {
         return res.status(500).json(e.message);
     }

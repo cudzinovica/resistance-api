@@ -70,10 +70,23 @@ exports.createPlayer = async function(gameId, player){
     }
 }
 
-exports.updatePlayer = async function(gameId, player){
+exports.updatePlayer = async function(player){
     try{
-        var savedPlayer = await player.save()
-        return savedPlayer;
+        const id = player.id;
+
+        try {
+            var oldPlayer = await Player.findById(id);
+        } catch(e) {
+            throw Error('Error occured while finding Player: ' + e.message);
+        }
+
+        for (attribute in Object.entries(player)) {
+            const [key, value] = attribute;
+            oldPlayer[key] = value;
+        }
+
+        var updatedPlayer = await oldPlayer.save();
+        return updatedPlayer;
     }catch(e){
         throw Error("And Error occured while updating the Player: " + e.message);
     }
@@ -82,7 +95,7 @@ exports.updatePlayer = async function(gameId, player){
 exports.deletePlayer = async function(gameId, id){
     try{
         let deleted = await Player.deleteOne({_id: id})
-        if(deleted.result.n === 0){
+        if(deleted.deletedCount === 0){
             throw Error("Player Could not be deleted")
         }
         

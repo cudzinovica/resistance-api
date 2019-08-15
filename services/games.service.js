@@ -21,6 +21,7 @@ exports.getGames = async function(query, page, limit){
 exports.getGame = async function(id){
     try {
         var game = await Game.findById(id).populate('players');
+        console.log(game);
         return game;
     } catch (e) {
         throw Error('Error while Finding Game: ' + e.message)
@@ -34,8 +35,9 @@ exports.createGame = async function(){
         missionResults: [],
         failedVotes: 0,
         currentRound: 0,
-        currentLeader: null,
-        currentTeam: []
+        currentLeaderIdx: null,
+        currentTeam: [],
+        winningTeam: null
     })
 
     try{
@@ -48,8 +50,20 @@ exports.createGame = async function(){
 
 exports.updateGame = async function(game){
     try{
-        var savedGame = await game.save()
-        return savedGame;
+        const id = game.id;
+
+        try {
+            var oldGame = await Game.findById(id).populate('players');
+        } catch(e) {
+            throw Error('Error occured while finding Game: ' + e.message);
+        }
+
+        for (var [key, value] of Object.entries(game.toObject())) {
+            oldGame[key] = value;
+        }
+
+        var updatedGame = await oldGame.save();
+        return updatedGame;
     }catch(e){
         throw Error("An Error occured while updating the Game: " + e.message);
     }

@@ -9,8 +9,6 @@ exports.getGames = async function(req, res, next){
     var page = req.query.page ? req.query.page : 1
     var limit = req.query.limit ? req.query.limit : 10; 
 
-    console.log(page, limit)
-
     try{
         var games = await GameService.getGames({}, page, limit)
         return res.status(200).json(games);
@@ -42,7 +40,7 @@ exports.createGame = async function(req, res, next){
 }
 
 exports.updateGame = async function(req, res, next){
-    var game = req.body.game;
+    let game = req.body.game;
     game.id = req.params.id;
 
     try{
