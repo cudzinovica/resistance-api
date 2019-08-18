@@ -23,7 +23,7 @@ exports.startGame = async function(req, res, next) {
     const playerId = req.params.playerId;
     
     try {
-        const game = await GameService.getGame(gameId);
+        let game = await GameService.getGame(gameId);
 
         // check in lobby phase
         if (game.phase != GamePhaseEnum.lobby) {
@@ -41,6 +41,8 @@ exports.startGame = async function(req, res, next) {
         game.missionResults = [];
         game.failedVotes = 0;
         game.currentRound = 0;
+        game.currentTeam = [];
+        game.winningTeam = null;
 
         // assign players' loyalties
         let numEvil = Math.ceil(numPlayers / 3)
@@ -66,7 +68,8 @@ exports.startGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        return res.status(200).json(updatedGame);
+        game = await GameService.getGame(game, true);
+        return res.status(200).json(game);
 
     } catch(e) {
         return res.status(500).json(e.message);
@@ -91,7 +94,8 @@ exports.endGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        return res.status(200).json(updatedGame);
+        game = await GameService.getGame(game, true);
+        return res.status(200).json(game);
 
     } catch(e) {
         return res.status(500).json(e.message);
@@ -103,7 +107,7 @@ exports.submitSelection = async function(req, res, next) {
     const playerId = req.params.playerId;
 
     try {
-        const game = await GameService.getGame(gameId);
+        let game = await GameService.getGame(gameId);
 
         // confirm in selection phase
         if (game.phase != GamePhaseEnum.selection) {
@@ -111,18 +115,20 @@ exports.submitSelection = async function(req, res, next) {
         }
 
         // confirm player is leader
-        if (game.players[game.currentLeaderIdx].id != playerId ) {
+        if (game.players[game.currentLeaderIdx] != playerId ) {
             return res.status(400).json("Must be leader to submit selection")
         }
 
         // confirm num submitted players is correct
         const selection = req.body.selection;
         const requiredTeamSize = teamSizeMap[game.players.length][game.currentRound];
-        console.log(selection);
-        console.log(requiredTeamSize);
-        console.log(selection.length)
         if (selection.length != requiredTeamSize) {
             return res.status(400).json(`Team selection must be ${requiredTeamSize} players large`)
+        }
+
+        // confirm submitted players exist in this game
+        if (!selection.every(playerId => { return game.players.includes(playerId); })) {
+            return res.status(400).json(`Not all submitted players are in this game`)
         }
 
         // set submitted players as current team
@@ -134,7 +140,8 @@ exports.submitSelection = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        return res.status(200).json(updatedGame);
+        game = await GameService.getGame(game, true);
+        return res.status(200).json(game);
 
     } catch(e) {
         return res.status(500).json(e.message);
@@ -207,22 +214,31 @@ exports.submitVote = async function(req, res, next) {
         
         const savedGame = await GameService.updateGame(game);
 
-        return res.status(200).json(savedGame);
+        game = await GameService.getGame(game, true);
+        return res.status(200).json(game);
     } catch(e) {
         return res.status(500).json(e.message);
     }
 }
 
 exports.submitQuest = async function(req, res, next) {
-    // if 4th quest and 7 or more players, two fails required to fail quest
-    return res.status(405).json();
 
-    // const gameId = req.params.gameId;
-    // const playerId = req.params.playerId;
+    const gameId = req.params.gameId;
+    const playerId = req.params.playerId;
 
-    // try {
-        // return res.status(200).json(updatedGame);
-    // } catch(e) {
-    //     return res.status(500).json(e.message);
-    // }
+    try {
+        // check in quest phase
+
+        // check curr player is in current team
+
+        // 
+
+        
+        // if 4th quest and 7 or more players, two fails required to fail quest
+
+        game = await GameService.getGame(game, true);
+        return res.status(200).json(game);
+    } catch(e) {
+        return res.status(500).json(e.message);
+    }
 }

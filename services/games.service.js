@@ -4,11 +4,13 @@ var GamePhaseEnum = require('../enums/gamePhase.enum')
 _this = this
 
 
-exports.getGames = async function(query, page, limit){
+exports.getGames = async function(query, page, limit, populatePlayers) {
     var options = {
         page: page,
-        limit: limit,
-        populate: 'players'
+        limit: limit
+    }
+    if (populatePlayers) {
+        options.populate = 'players'
     }
     try {
         var games = await Game.paginate(query, options);
@@ -18,9 +20,14 @@ exports.getGames = async function(query, page, limit){
     }
 }
 
-exports.getGame = async function(id){
+exports.getGame = async function(id, populatePlayers) {
     try {
-        var game = await Game.findById(id).populate('players');
+        if (populatePlayers) {
+            var game = await Game.findById(id).populate('players');
+        } else {
+            var game = await Game.findById(id);
+        }
+
         console.log(game);
         return game;
     } catch (e) {

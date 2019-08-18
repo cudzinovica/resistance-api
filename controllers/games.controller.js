@@ -5,12 +5,12 @@ _this = this
 
 
 exports.getGames = async function(req, res, next){
-
     var page = req.query.page ? req.query.page : 1
-    var limit = req.query.limit ? req.query.limit : 10; 
+    var limit = req.query.limit ? req.query.limit : 10;
+    var populatePlayers = req.query.populatePlayers ? req.query.populatePlayers : false;
 
     try{
-        var games = await GameService.getGames({}, page, limit)
+        var games = await GameService.getGames({}, page, limit, populatePlayers)
         return res.status(200).json(games);
     }catch(e){
         return res.status(500).json(e.message);
@@ -18,11 +18,11 @@ exports.getGames = async function(req, res, next){
 }
 
 exports.getGame = async function(req, res, next){
-
     var id = req.params.id;
+    var populatePlayers = req.query.populatePlayers ? req.query.populatePlayers : false;
 
     try{
-        var game = await GameService.getGame(id)
+        var game = await GameService.getGame(id, populatePlayers)
         return res.status(200).json(game);
     }catch(e){
         return res.status(500).json(e.message);
