@@ -48,7 +48,7 @@ exports.createPlayer = async function(req, res, next){
 }
 
 exports.updatePlayer = async function(req, res, next){
-    let player = req.body.player;
+    let player = req.body;
     player.id = req.params.id;
     
     try{

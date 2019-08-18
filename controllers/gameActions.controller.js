@@ -169,7 +169,11 @@ exports.submitVote = async function(req, res, next) {
         let numVotedYes = 0;
         if (game.players.every(player => { if (player.currentVote) numVotedYes++; return player.hasVoted })){
             // set everyone's hasVoted to false
-            game.players.forEach(player => { player.hasVoted = false; });
+            for (var i = 0; i < game.players.length; i++) {
+                var player = game.players[i];
+                player.hasVoted = false;
+                await PlayerService.updatePlayer(player);
+            }
 
             // if majority voted yes
             if (numVotedYes > game.players.length / 2){

@@ -40,7 +40,7 @@ exports.createGame = async function(req, res, next){
 }
 
 exports.updateGame = async function(req, res, next){
-    let game = req.body.game;
+    let game = req.body;
     game.id = req.params.id;
 
     try{

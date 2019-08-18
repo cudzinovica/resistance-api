@@ -58,7 +58,7 @@ exports.updateGame = async function(game){
             throw Error('Error occured while finding Game: ' + e.message);
         }
 
-        for (var [key, value] of Object.entries(game.toObject())) {
+        for (var [key, value] of Object.entries(game)) {
             oldGame[key] = value;
         }
 

@@ -80,8 +80,7 @@ exports.updatePlayer = async function(player){
             throw Error('Error occured while finding Player: ' + e.message);
         }
 
-        for (attribute in Object.entries(player)) {
-            const [key, value] = attribute;
+        for (var [key, value] of Object.entries(player)) {
             oldPlayer[key] = value;
         }
 
