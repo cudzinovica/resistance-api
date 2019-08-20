@@ -68,7 +68,7 @@ exports.startGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        game = await GameService.getGame(game, true);
+        game = await GameService.getGame(gameId, true);
         return res.status(200).json(game);
 
     } catch(e) {
@@ -94,7 +94,7 @@ exports.endGame = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        game = await GameService.getGame(game, true);
+        game = await GameService.getGame(gameId, true);
         return res.status(200).json(game);
 
     } catch(e) {
@@ -140,7 +140,7 @@ exports.submitSelection = async function(req, res, next) {
         // update game
         let updatedGame = await GameService.updateGame(game);
 
-        game = await GameService.getGame(game, true);
+        game = await GameService.getGame(gameId, true);
         return res.status(200).json(game);
 
     } catch(e) {
@@ -161,25 +161,33 @@ exports.submitVote = async function(req, res, next) {
         }
 
         // update player's vote and set hasVoted to true
-        let currPlayer = await PlayerService.getPlayer(gameId, playerId);
+        let player = await PlayerService.getPlayer(gameId, playerId);
 
         const playerVote = req.body.vote;
 
-        currPlayer.currentVote = playerVote;
-        currPlayer.hasVoted = true;
+        player.currentVote = playerVote;
+        player.hasVoted = true;
 
-        var updatedPlayer = await PlayerService.updatePlayer(currPlayer);
+        var updatedPlayer = await PlayerService.updatePlayer(player);
 
         game = await GameService.getGame(gameId);
 
         // if all players have voted:
-        let numVotedYes = 0;
-        if (game.players.every(player => { if (player.currentVote) numVotedYes++; return player.hasVoted })){
-            // set everyone's hasVoted to false
+        let allVoted = true;
+        for (var i = 0; i < game.players.length; i++) {
+            let currPlayerId = game.players[i];
+            let player = await PlayerService.getPlayer(gameId, currPlayerId);
+            if (!player.hasVoted) allVoted = false;
+        }
+        if ( allVoted ) {
+            // set everyone's hasVoted to false and count number of yes votes
+            let numVotedYes = 0;
             for (var i = 0; i < game.players.length; i++) {
-                var player = game.players[i];
-                player.hasVoted = false;
-                await PlayerService.updatePlayer(player);
+                let currPlayerId = game.players[i];
+                let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
+                if (player.currentVote) numVotedYes++;
+                currPlayer.hasVoted = false;
+                await PlayerService.updatePlayer(currPlayer);
             }
 
             // if majority voted yes
@@ -214,7 +222,7 @@ exports.submitVote = async function(req, res, next) {
         
         const savedGame = await GameService.updateGame(game);
 
-        game = await GameService.getGame(game, true);
+        game = await GameService.getGame(gameId, true);
         return res.status(200).json(game);
     } catch(e) {
         return res.status(500).json(e.message);
