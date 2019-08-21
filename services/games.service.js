@@ -28,7 +28,6 @@ exports.getGame = async function(id, populatePlayers) {
             var game = await Game.findById(id);
         }
 
-        console.log(game);
         return game;
     } catch (e) {
         throw Error('Error while Finding Game: ' + e.message)
@@ -70,6 +69,7 @@ exports.updateGame = async function(game){
         }
 
         var updatedGame = await oldGame.save();
+        console.log(updatedGame);
         return updatedGame;
     }catch(e){
         throw Error("An Error occured while updating the Game: " + e.message);
@@ -79,7 +79,7 @@ exports.updateGame = async function(game){
 exports.deleteGame = async function(id){
     try{
         var deleted = await Game.deleteOne({_id: id})
-        console.log(deleted)
+        
         if(deleted.deletedCount === 0){
             throw Error("Game Could not be deleted")
         }

@@ -176,8 +176,8 @@ exports.submitVote = async function(req, res, next) {
         let allVoted = true;
         for (var i = 0; i < game.players.length; i++) {
             let currPlayerId = game.players[i];
-            let player = await PlayerService.getPlayer(gameId, currPlayerId);
-            if (!player.hasVoted) allVoted = false;
+            let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
+            if (!currPlayer.hasVoted) allVoted = false;
         }
         if ( allVoted ) {
             // set everyone's hasVoted to false and count number of yes votes
@@ -235,17 +235,88 @@ exports.submitQuest = async function(req, res, next) {
     const playerId = req.params.playerId;
 
     try {
+        let game = await GameService.getGame(gameId);
+
         // check in quest phase
+        if (game.phase != GamePhaseEnum.quest){
+            return res.status(400).json('Must be in quest phase');
+        }
 
         // check curr player is in current team
+        if ( !game.currentTeam.includes(playerId) ){
+            return res.status(400).json('Must be part of the quest team');
+        }
 
-        // 
+        // update current quest and set has quested to true
+        const playerQuest = req.body.quest;
 
+        let currPlayer = await PlayerService.getPlayer(gameId, playerId);
+
+        currPlayer.currentQuest = playerQuest;
+        currPlayer.hasQuested = true;
+
+        let updatedPlayer = await PlayerService.updatePlayer(currPlayer);
+
+        // if all players have quested:
+        let allQuested = true;
+        for( var i = 0; i < game.currentTeam.length; i++ ) {
+            let currPlayerId = game.currentTeam[i];
+            let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
+            if( !currPlayer.hasQuested ) allQuested = false;
+        }
+        if( allQuested ) {
+            // set everyone's has quested to false and count num fails
+            let numFails = 0;
+            for( var i = 0; i < game.currentTeam.length; i++ ) {
+                let currPlayerId = game.currentTeam[i];
+                let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
+                if( !currPlayer.currentQuest ) numFails++;
+                currPlayer.hasQuested = false;
+                let updatedPlayer = await PlayerService.updatePlayer(currPlayer);
+            }
+
+            // calculate mission result
+            // (one fail to fail mission, if 4th quest and 7 or more players, two fails required to fail quest
+            let missionSuccess;
+            if ( game.currentRound == 3 && game.players.length >= 7 ) {
+                missionSuccess = numFails < 2;
+            } else {
+                missionSuccess = numFails == 0;
+            }
+            
+            // set current round's mission result to mission result
+            game.missionResults.push(missionSuccess);
+
+            // if 3 wins for good or evil
+                // set winning team
+                // set game phase to lobby
+            let goodSuccesses = 0;
+            let evilSuccesses = 0;
+            game.missionResults.forEach(missionResult => { if( missionResult ) goodSuccesses++; else evilSuccesses++; })
+            if( goodSuccesses >= 3 ) {
+                game.winningTeam = LoyaltyEnum.good;
+                game.phase = GamePhaseEnum.lobby;
+            } else if( evilSuccesses >= 3) {
+                game.winningTeam = LoyaltyEnum.evil;
+                game.phase = GamePhaseEnum.lobby;
+            } 
+            // else
+            else {
+                // increment current round
+                game.currentRound++;
+
+                // increment current leader
+                game.currentLeaderIdx = (game.currentLeaderIdx + 1) % game.players.length;
+
+                // set game phase to selection
+                game.phase = GamePhaseEnum.selection;
+            }
+        }
         
-        // if 4th quest and 7 or more players, two fails required to fail quest
+        const updatedGame = await GameService.updateGame(game);
 
-        game = await GameService.getGame(game, true);
-        return res.status(200).json(game);
+        let gottenGame = await GameService.getGame(gameId, true);
+        return res.status(200).json(gottenGame);
     } catch(e) {
         return res.status(500).json(e.message);
     }

@@ -6,7 +6,9 @@ var PlayerSchema = new mongoose.Schema({
     loyalty: Boolean,
     character: Number,
     currentVote: Boolean,
-    hasVoted: Boolean
+    hasVoted: Boolean,
+    currentQuest: Boolean,
+    hasQuested: Boolean
 })
 
 PlayerSchema.plugin(mongoosePaginate)

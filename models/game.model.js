@@ -9,7 +9,7 @@ const GameSchema = Schema({
     phase: Number,
     players: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
     currentLeaderIdx: Number,
-    missionResults: [Boolean],
+    missionResults: [{type: Boolean}],
     failedVotes: Number,
     currentRound: Number,
     currentTeam: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],

@@ -14,8 +14,6 @@ getGame = async function(gameId) {
         throw Error("Error occured while Finding the Game: " + e.message)
     }
 
-    console.log(oldGame)
-
     return oldGame
 }
 
@@ -55,7 +53,9 @@ exports.createPlayer = async function(gameId, player){
         loyalty: false,
         character: 0,
         currentVote: false,
-        hasVoted: false
+        hasVoted: false,
+        currentQuest: false,
+        hasQuested: false
     })
 
     try{
