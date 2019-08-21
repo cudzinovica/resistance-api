@@ -110,7 +110,7 @@ Run `npm start` to run the NodeJS Server.
 * Player starts game
   * Start Game
 
-**Setup Phase**
+**Setup Phase** (Not yet implemented)
 * Player submits setup
   * Submit Setup
 
@@ -130,6 +130,6 @@ Run `npm start` to run the NodeJS Server.
 * Player submits quest card
   * Submit Quest
 
-**Assassin Phase**
+**Assassin Phase** (Not yet implemented)
 * Assassin chooses player
   * Submit Assassin
