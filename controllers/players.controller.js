@@ -35,7 +35,7 @@ exports.getPlayer = async function(req, res, next){
 exports.createPlayer = async function(req, res, next){
     var gameId = req.params.gameId;
 
-    var player = req.body.player;
+    var player = req.body;
 
     try{
         var createdPlayer = await PlayerService.createPlayer(gameId, player)

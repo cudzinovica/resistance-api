@@ -1,5 +1,4 @@
-var GameService = require('../services/games.service')
-var GamePhase = require('../enums/gamePhase.enum')
+var GameService = require('../services/games.service');
 
 _this = this
 

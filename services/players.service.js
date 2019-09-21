@@ -42,13 +42,13 @@ exports.getPlayer = async function(gameId, id){
 }
 
 exports.createPlayer = async function(gameId, player){
-    oldGame = await getGame(gameId)
+    let oldGame = await getGame(gameId)
 
     if( !oldGame ){
         return false
     }
 
-    var newPlayer = new Player({
+    let newPlayer = new Player({
         name: player.name,
         loyalty: false,
         character: 0,
@@ -98,7 +98,17 @@ exports.deletePlayer = async function(gameId, id){
             throw Error("Player Could not be deleted")
         }
         
-        let savedGame = await Game.findOneAndUpdate(gameId, {$pull: {players: id}});
+        let oldGame = await Game.findById(gameId);
+        let index = oldGame.players.indexOf(id);
+
+        if (index < 0) {
+            throw Error("Player is not part of this game");
+        }
+        oldGame.players.splice(index, 1);
+
+        let savedGame = oldGame.save();
+
+        console.log(savedGame);
 
         return deleted
     }catch(e){
