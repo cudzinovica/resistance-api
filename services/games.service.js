@@ -77,14 +77,10 @@ exports.updateGame = async function(game){
 }
 
 exports.deleteGame = async function(id){
-    try{
-        var deleted = await Game.deleteOne({_id: id})
-        
-        if(deleted.deletedCount === 0){
-            throw Error("Game Could not be deleted")
-        }
-        return deleted
-    }catch(e){
-        throw Error("Error Occured while Deleting the Game: " + e.message)
+    var deleted = await Game.deleteOne({_id: id})
+    
+    if(deleted.deletedCount === 0){
+        return [400, "Game Could not be deleted"];
     }
+    return [200, null];
 }

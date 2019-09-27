@@ -51,14 +51,17 @@ exports.updateGame = async function(req, res, next){
 }
 
 exports.removeGame = async function(req, res, next){
-
     var id = req.params.id;
 
     try{
-        var deleted = await GameService.deleteGame(id);
-        return res.status(204).json();
+        let [statusCode, response] = await GameService.deleteGame(id);
+        if (response) {
+            return res.status(statusCode).json(response);
+        } else {
+            return res.status(statusCode).json();
+        }
     }catch(e){
-        return res.status(500).json(e.message)
+        return res.status(500).json("Error Occured while Deleting the Game: " + e.message);
     }
 
 }

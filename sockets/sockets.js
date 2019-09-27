@@ -1,8 +1,12 @@
 module.exports = function(io) {
-    io.on('connection', function(socket) {
-        socket.emit('news', 'world');
-        socket.on('test-event', function (data) {
-            console.log(data);
+    io.on('connection', socket => {
+        let room;
+        socket.on('join-game', data => {
+            room = data.room;
+            socket.join(room);
+        });
+        socket.on('start-game', data => {
+            
         })
     });
 }
