@@ -24,15 +24,22 @@ module.exports = function(io) {
         socket.on('start-game', data => {
             const gameId = data.gameId;
 
-            const [statusCode, resp] = GameActionsService.startGame(gameId);
+            GameActionsService.startGame(gameId).then(rsp => {
+                const [statusCode, resp] = rsp;
 
-            if (statusCode == 200) {
-                //broadcst game to room
-                io.to(gameId).emit('game', resp);
-            } else {
-                //emit error to socket
-                socket.emit('error', resp);
-            }
+                if (statusCode == 200) {
+                    //broadcst game to room
+                    io.to(gameId).emit('game', resp);
+                } else {
+                    //emit error to socket
+                    socket.emit('error_msg', resp);
+                    GamesService.getGame(gameId, true).then(game => {
+                        socket.emit('game', game);
+                    });
+                }
+            }).catch(error => {
+                socket.emit('error_msg', error);
+            });
         });
 
     });
