@@ -18,7 +18,7 @@ exports.getGames = async function(req, res, next){
 
 exports.getGame = async function(req, res, next){
     var id = req.params.id;
-    var populatePlayers = req.query.populatePlayers ? req.query.populatePlayers : false;
+    var populatePlayers = req.query.populatePlayers == 'true' ? true : false;
 
     try{
         var game = await GameService.getGame(id, populatePlayers)
