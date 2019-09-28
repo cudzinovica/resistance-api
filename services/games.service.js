@@ -20,7 +20,7 @@ exports.getGames = async function(query, page, limit, populatePlayers) {
     }
 }
 
-exports.getGame = async function(id, populatePlayers) {
+exports.getGame = async function(id, populatePlayers=false) {
     try {
         if (populatePlayers) {
             var game = await Game.findById(id).populate('players');
