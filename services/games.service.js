@@ -1,37 +1,21 @@
-var Game = require('../models/game.model')
-var GamePhaseEnum = require('../enums/gamePhase.enum')
+var Game = require('../models/game.model');
+var GamePhaseEnum = require('../enums/gamePhase.enum');
 
 _this = this
 
 
-exports.getGames = async function(query, page, limit, populatePlayers) {
+exports.getGames = async function(query, page, limit) {
     var options = {
         page: page,
         limit: limit
     }
-    if (populatePlayers) {
-        options.populate = 'players'
-    }
-    try {
-        var games = await Game.paginate(query, options);
-        return games;
-    } catch (e) {
-        throw Error('Error while Paginating Games: ' + e.message)
-    }
+
+    var games = await Game.paginate(query, options);
+    return [200, games];
 }
 
-exports.getGame = async function(id, populatePlayers=false) {
-    try {
-        if (populatePlayers) {
-            var game = await Game.findById(id).populate('players');
-        } else {
-            var game = await Game.findById(id);
-        }
-
-        return game;
-    } catch (e) {
-        throw Error('Error while Finding Game: ' + e.message)
-    }
+exports.getGame = async function(id) {
+    return [200, await Game.findById(id)];
 }
 
 exports.createGame = async function(){
@@ -46,41 +30,23 @@ exports.createGame = async function(){
         winningTeam: null
     })
 
-    try{
-        var savedGame = await newGame.save()
-        return savedGame;
-    }catch(e){
-        throw Error("Error while Creating Game: " + e.message)
-    }
+    return [201, await newGame.save()];
 }
 
-exports.updateGame = async function(game){
-    try{
-        const id = game.id;
+exports.updateGame = async function(game) {
+    const id = game.id;
 
-        try {
-            var oldGame = await Game.findById(id).populate('players');
-        } catch(e) {
-            throw Error('Error occured while finding Game: ' + e.message);
-        }
+    var oldGame = await Game.findById(id);
 
-        for (var [key, value] of Object.entries(game)) {
-            oldGame[key] = value;
-        }
-
-        var updatedGame = await oldGame.save();
-        console.log(updatedGame);
-        return updatedGame;
-    }catch(e){
-        throw Error("An Error occured while updating the Game: " + e.message);
+    for (var [key, value] of Object.entries(game)) {
+        oldGame[key] = value;
     }
+
+    return [201, await oldGame.save()];
 }
 
 exports.deleteGame = async function(id){
     var deleted = await Game.deleteOne({_id: id})
     
-    if(deleted.deletedCount === 0){
-        return [400, "Game Could not be deleted"];
-    }
-    return [200, null];
+    return [204, null];
 }

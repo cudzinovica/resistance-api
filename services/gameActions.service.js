@@ -61,11 +61,9 @@ exports.startGame = async function(gameId) {
     game.phase = GamePhaseEnum.selection;
 
     // update game
-    await GameService.updateGame(game);
+    let updatedGame = await GameService.updateGame(game.toObject());
 
-    game = await GameService.getGame(gameId, true);
-
-    return [200, game];
+    return [200, updatedGame];
 }
 
 
@@ -80,9 +78,9 @@ exports.endGame = async function(gameId, playerId) {
     game.phase = GamePhaseEnum.lobby;
 
     // update game
-    await GameService.updateGame(game);
+    await GameService.updateGame(game.toObject());
 
-    game = await GameService.getGame(gameId, true);
+    game = await GameService.getGame(gameId);
 
     return [200, game];
 }
@@ -118,9 +116,9 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     game.phase = GamePhaseEnum.vote;
 
     // update game
-    await GameService.updateGame(game);
+    await GameService.updateGame(game.toObject());
 
-    game = await GameService.getGame(gameId, true);
+    game = await GameService.getGame(gameId);
     
     return [200, game];
 }
@@ -191,9 +189,9 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
         }
     }
     
-    await GameService.updateGame(game);
+    await GameService.updateGame(game.toObject());
 
-    game = await GameService.getGame(gameId, true);
+    game = await GameService.getGame(gameId);
     
     return [200, game];
 }
@@ -275,9 +273,9 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
         }
     }
     
-    await GameService.updateGame(game);
+    await GameService.updateGame(game.toObject());
 
-    let gottenGame = await GameService.getGame(gameId, true);
+    let gottenGame = await GameService.getGame(gameId);
     
     return [200, gottenGame];
 }

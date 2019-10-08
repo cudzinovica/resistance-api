@@ -1,54 +1,37 @@
-var Player = require('../models/player.model')
-var Game = require('../models/game.model')
+var Game = require('../models/game.model');
 
-var CharacterEnum = require('../enums/character.enum')
-var LoyaltyEnum = require('../enums/loyalty.enum')
-
-_this = this
+_this = this;
 
 
-getGame = async function(gameId) {
-    try{
-        var oldGame = await Game.findById(gameId).populate('players')
-    }catch(e){
-        throw Error("Error occured while Finding the Game: " + e.message)
+exports.getPlayers = async function(gameId){
+    const game = await Game.findById(gameId)
+    if( !game ){
+        return [404, 'Game not found'];
     }
-
-    return oldGame
+    var players = game.players;
+    return [200, players];
 }
 
-exports.getPlayers = async function(gameId, query, page, limit){
-    oldGame = await getGame(gameId)
-
-    if( !oldGame ){
-        return false
+exports.getPlayer = async function(gameId, playerId){
+    const game = await Game.findById(gameId)
+    if( !game ){
+        return [404, 'Game not found'];
     }
 
-    try {
-        var players = oldGame.players;
-        return players;
-    } catch (e) {
-        throw Error('Error while Retrieving Players: ' + e.message)
+    const player = game.players.find(player => player.id === playerId);
+    if (!player) {
+        return [404, 'Player not founc'];
     }
-}
-
-exports.getPlayer = async function(gameId, id){
-    try {
-        var player = await Player.findById(id)
-        return player;
-    } catch (e) {
-        throw Error('Error while Finding Player: ' + e.message)
-    }
+    return [200, player];
 }
 
 exports.createPlayer = async function(gameId, player){
-    let oldGame = await getGame(gameId)
-
-    if( !oldGame ){
-        return false
+    const game = await Game.findById(gameId)
+    if( !game ){
+        return [404, 'Game not found'];
     }
 
-    let newPlayer = new Player({
+    const newPlayer = {
         name: player.name,
         loyalty: false,
         character: 0,
@@ -56,62 +39,42 @@ exports.createPlayer = async function(gameId, player){
         hasVoted: false,
         currentQuest: false,
         hasQuested: false
-    })
-
-    try{
-        var savedPlayer = await newPlayer.save();
-
-        oldGame.players = oldGame.players.concat([newPlayer]);
-        var savedGame = await oldGame.save();
-
-        return savedPlayer;
-    }catch(e){
-        throw Error("Error while Creating Player: " + e.message)
     }
+
+    game.players = game.players.concat([newPlayer]);
+
+    const playerId = game.players[game.players.length-1];
+
+    await game.save();
+    return [201, playerId];
 }
 
-exports.updatePlayer = async function(player){
-    try{
-        const id = player.id;
-
-        try {
-            var oldPlayer = await Player.findById(id);
-        } catch(e) {
-            throw Error('Error occured while finding Player: ' + e.message);
-        }
-
-        for (var [key, value] of Object.entries(player)) {
-            oldPlayer[key] = value;
-        }
-
-        var updatedPlayer = await oldPlayer.save();
-        return updatedPlayer;
-    }catch(e){
-        throw Error("And Error occured while updating the Player: " + e.message);
+exports.updatePlayer = async function(gameId, newPlayer){
+    let game = await Game.findById(gameId);
+    if( !game ){
+        return [404, 'Game not found'];
     }
+
+    const playerIndex = game.players.findIndex(player => player.id === newPlayer.id);
+
+    const player = game.players[playerIndex];
+
+    for (var [key, value] of Object.entries(newPlayer)) {
+        player[key] = value;
+    }
+
+    await game.save();
+    return [201, player];
 }
 
-exports.deletePlayer = async function(gameId, id){
-    try{
-        let deleted = await Player.deleteOne({_id: id})
-        if(deleted.deletedCount === 0){
-            throw Error("Player Could not be deleted")
-        }
-        
-        let oldGame = await Game.findById(gameId);
-        let index = oldGame.players.indexOf(id);
-
-        if (index < 0) {
-            throw Error("Player is not part of this game");
-        }
-        oldGame.players.splice(index, 1);
-
-        let savedGame = oldGame.save();
-
-        console.log(savedGame);
-
-        return deleted
-    }catch(e){
-        throw Error("Error Occured while Deleting the Player: " + e.message)
+exports.deletePlayer = async function(gameId, playerId){
+    let game = await Game.findById(gameId);
+    if( !game ){
+        return [404, 'Game not found'];
     }
+
+    game.players = game.players.filter(player => player.id !== playerId);
+
+    await oldGame.save();
+    return [204, null];
 }
