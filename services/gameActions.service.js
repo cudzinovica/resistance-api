@@ -103,12 +103,12 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     }
 
     // confirm submitted players exist in this game
-    if (!selection.every(playerId => { return game.players.some(player => player.id === playerId); })) {
+    if (!selection.every(playerId => game.players.find(player => player.id === playerId) !== undefined)) {
         return [400, `Not all submitted players are in this game`];
     }
 
-    // set submitted players as current team
-    game.currentTeam = selection.map(playerId => game.players.find(player => player.id == playerId));
+    // set submitted players ids as current team
+    game.currentTeam = selection;
 
     // update phase to vote phase
     game.phase = GamePhaseEnum.vote;
@@ -193,35 +193,33 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
     }
 
     // check curr player is in current team
-    if ( !game.currentTeam.includes(playerId) ){
+    if (!game.currentTeam.includes(playerId)){
         return [400, 'Must be part of the quest team'];
     }
 
     // update current quest and set has quested to true
-    let currPlayer = await PlayerService.getPlayer(gameId, playerId);
+    const playerIndex = game.players.findIndex(player => player.id === playerId);
+    const player = game.players[playerIndex];
 
-    currPlayer.currentQuest = playerQuest;
-    currPlayer.hasQuested = true;
+    player.currentQuest = playerQuest;
+    player.hasQuested = true;
 
-    let updatedPlayer = await PlayerService.updatePlayer(currPlayer);
+    // update and retrieve game to minimize chance for missing other players' updates
+    await GameService.updateGame(game.id, game.toObject());
+    game = (await GameService.getGame(gameId))[1];
 
     // if all players have quested:
-    let allQuested = true;
-    for( var i = 0; i < game.currentTeam.length; i++ ) {
-        let currPlayerId = game.currentTeam[i];
-        let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
-        if( !currPlayer.hasQuested ) allQuested = false;
-    }
+    let allQuested = game.currentTeam.every(playerId => game.players.find(player => player.id === playerId).hasQuested);
+
     if( allQuested ) {
         // set everyone's has quested to false and count num fails
         let numFails = 0;
-        for( var i = 0; i < game.currentTeam.length; i++ ) {
-            let currPlayerId = game.currentTeam[i];
-            let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
-            if( !currPlayer.currentQuest ) numFails++;
-            currPlayer.hasQuested = false;
-            let updatedPlayer = await PlayerService.updatePlayer(currPlayer);
-        }
+        game.currentTeam.forEach(playerId => {
+            const playerIndex = game.players.findIndex(player => player.id === playerId);
+            const player = game.players[playerIndex];
+            if (!player.currentQuest) numFails++;
+            player.hasQuested = false;
+        })
 
         // calculate mission result
         // (one fail to fail mission, if 4th quest and 7 or more players, two fails required to fail quest

@@ -46,9 +46,6 @@ module.exports = function(io) {
                 } else {
                     //emit error to socket
                     socket.emit('error_msg', resp);
-                    GamesService.getGame(gameId, true).then(([statusCode, resp]) => {
-                        socket.emit('game', resp);
-                    });
                 }
             }).catch(error => {
                 socket.emit('error_msg', error);

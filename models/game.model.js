@@ -11,7 +11,7 @@ const GameSchema = Schema({
     missionResults: [{type: Boolean}],
     failedVotes: Number,
     currentRound: Number,
-    currentTeam: [PlayerSchema],
+    currentTeam: [{type: String}],
     winningTeam: Boolean
 });
 
