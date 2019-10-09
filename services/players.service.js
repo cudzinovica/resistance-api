@@ -75,6 +75,6 @@ exports.deletePlayer = async function(gameId, playerId){
 
     game.players = game.players.filter(player => player.id !== playerId);
 
-    await oldGame.save();
+    await game.save();
     return [204, null];
 }
