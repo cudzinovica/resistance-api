@@ -71,11 +71,37 @@ module.exports = function(io) {
             });
         });
 
-        /** Submit selection. Broadcast. */
+        /** Submit vote. Broadcast. */
         socket.on('submit-selection', data => {
             console.log(`${gameId}: ${playerId} submitted selection`)
             const selection = data.selection;
             GameActionsService.submitSelection(gameId, playerId, selection).then(([statusCode, resp]) => {
+                if (statusCode == 200) {
+                    io.to(gameId).emit('game', resp);
+                } else {
+                    socket.emit('error_msg', resp);
+                }
+            })
+        })
+
+        /** Submit vote. Broadcast. */
+        socket.on('submit-vote', data => {
+            console.log(`${gameId}: ${playerId} submitted vote`)
+            const vote = data.vote;
+            GameActionsService.submitVote(gameId, playerId, vote).then(([statusCode, resp]) => {
+                if (statusCode == 200) {
+                    io.to(gameId).emit('game', resp);
+                } else {
+                    socket.emit('error_msg', resp);
+                }
+            })
+        })
+
+        /** Submit quest. Broadcast. */
+        socket.on('submit-quest', data => {
+            console.log(`${gameId}: ${playerId} submitted quest`)
+            const quest = data.quest;
+            GameActionsService.submitQuest(gameId, playerId, quest).then(([statusCode, resp]) => {
                 if (statusCode == 200) {
                     io.to(gameId).emit('game', resp);
                 } else {

@@ -56,7 +56,6 @@ exports.updatePlayer = async function(gameId, newPlayer){
     }
 
     const playerIndex = game.players.findIndex(player => player.id === newPlayer.id);
-
     const player = game.players[playerIndex];
 
     for (var [key, value] of Object.entries(newPlayer)) {

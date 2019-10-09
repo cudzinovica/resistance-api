@@ -108,7 +108,7 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     }
 
     // set submitted players as current team
-    game.currentTeam = selection;
+    game.currentTeam = selection.map(playerId => game.players.find(player => player.id == playerId));
 
     // update phase to vote phase
     game.phase = GamePhaseEnum.vote;
@@ -128,32 +128,26 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
     }
 
     // update player's vote and set hasVoted to true
-    let player = await PlayerService.getPlayer(gameId, playerId);
+    const playerIndex = game.players.findIndex(player => player.id === playerId);
+    const player = game.players[playerIndex];
 
     player.currentVote = playerVote;
     player.hasVoted = true;
 
-    var updatedPlayer = await PlayerService.updatePlayer(player);
-
+    // update and retrieve game to minimize chance for missing other players' updates
+    await GameService.updateGame(game.id, game.toObject());
     game = (await GameService.getGame(gameId))[1];
 
     // if all players have voted:
-    let allVoted = true;
-    for (var i = 0; i < game.players.length; i++) {
-        let currPlayerId = game.players[i];
-        let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
-        if (!currPlayer.hasVoted) allVoted = false;
-    }
-    if ( allVoted ) {
+    let allVoted = game.players.every(player => player.hasVoted);
+    
+    if (allVoted) {
         // set everyone's hasVoted to false and count number of yes votes
         let numVotedYes = 0;
-        for (var i = 0; i < game.players.length; i++) {
-            let currPlayerId = game.players[i];
-            let currPlayer = await PlayerService.getPlayer(gameId, currPlayerId);
+        game.players.forEach(player => {
             if (player.currentVote) numVotedYes++;
-            currPlayer.hasVoted = false;
-            await PlayerService.updatePlayer(currPlayer);
-        }
+            player.hasVoted = false;
+        })
 
         // if majority voted yes
         if (numVotedYes > game.players.length / 2){
