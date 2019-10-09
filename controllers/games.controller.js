@@ -38,10 +38,10 @@ exports.createGame = async function(req, res, next){
 
 exports.updateGame = async function(req, res, next){
     let game = req.body;
-    game.id = req.params.id;
+    let id = req.params.id;
 
     try{
-        const [statusCode, response] = await GameService.updateGame(game)
+        const [statusCode, response] = await GameService.updateGame(id, game)
         return res.status(statusCode).json(response)
     }catch(e){
         return res.status(500).json(e.message)

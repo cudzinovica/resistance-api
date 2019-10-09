@@ -92,7 +92,7 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     }
 
     // confirm player is leader
-    if (game.players[game.currentLeaderIdx] != playerId ) {
+    if (game.players[game.currentLeaderIdx].id != playerId ) {
         return [400, "Must be leader to submit selection"];
     }
 
@@ -103,7 +103,7 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     }
 
     // confirm submitted players exist in this game
-    if (!selection.every(playerId => { return game.players.includes(playerId); })) {
+    if (!selection.every(playerId => { return game.players.some(player => player.id === playerId); })) {
         return [400, `Not all submitted players are in this game`];
     }
 
@@ -253,7 +253,7 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
         } else if( evilSuccesses >= 3) {
             game.winningTeam = LoyaltyEnum.evil;
             game.phase = GamePhaseEnum.lobby;
-        } 
+        }
         // else
         else {
             // increment current round

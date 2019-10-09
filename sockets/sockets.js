@@ -8,16 +8,20 @@ function getAndBroadcastGame(io, gameId) {
     });
 }
 
+function deletePlayerAndBroadcastGame(io, gameId, playerId) {
+    PlayersService.deletePlayer(gameId, playerId).then(_ => {
+        getAndBroadcastGame(io, gameId);
+    });
+}
+
 module.exports = function(io) {
     io.on('connection', socket => {
         let gameId;
         let playerId;
 
         socket.on('disconnect', _ => {
-            console.log(`${playerId} disconnected from ${gameId}`);
-            PlayersService.deletePlayer(gameId, playerId).then(_ => {
-                getAndBroadcastGame(io, gameId);
-            });
+            console.log(`${gameId}: ${playerId} disconnected`);
+            deletePlayerAndBroadcastGame(io, gameId, playerId);
         });
 
         /** Set socket's player id. Join socket to game room. Broadcast game to room. Emit player id to socket.*/
@@ -25,26 +29,16 @@ module.exports = function(io) {
             gameId = data.gameId;
             playerId = data.playerId;
 
-            console.log(`${playerId} joined ${gameId}`)
+            console.log(`${gameId}: ${playerId} joined the game`)
 
             socket.join(gameId);
 
             getAndBroadcastGame(io, gameId);
         });
 
-        /** Delete player. Socket leaves game room. Broadcast game to room. */
-        socket.on('leave-game', _ => {
-            console.log(`${playerId} left ${gameId}`);
-            socket.leave(gameId);
-
-            getAndBroadcastGame(io, gameId);
-
-            gameId = "";
-        });
-
         /** Start game. Broadcast game to room. */
         socket.on('start-game', _ => {
-            console.log(`${playerId} started ${gameId}`);
+            console.log(`${gameId}: ${playerId} started the game`);
             GameActionsService.startGame(gameId).then(([statusCode, resp]) => {
                 if (statusCode == 200) {
                     //broadcst game to room
@@ -52,8 +46,8 @@ module.exports = function(io) {
                 } else {
                     //emit error to socket
                     socket.emit('error_msg', resp);
-                    GamesService.getGame(gameId, true).then(game => {
-                        socket.emit('game', game);
+                    GamesService.getGame(gameId, true).then(([statusCode, resp]) => {
+                        socket.emit('game', resp);
                     });
                 }
             }).catch(error => {
@@ -63,23 +57,31 @@ module.exports = function(io) {
 
         /** End game. Broadcast game to room. */
         socket.on('end-game', _ => {
-            console.log(`${playerId} ended ${gameId}`);
-            GameActionsService.endGame(gameId).then(rsp => {
-                const [statusCode, resp] = rsp;
-
+            console.log(`${gameId}: ${playerId} ended the game`);
+            GameActionsService.endGame(gameId).then(([statusCode, resp]) => {
                 if (statusCode == 200) {
                     //broadcst game to room
                     io.to(gameId).emit('game', resp);
                 } else {
                     //emit error to socket
                     socket.emit('error_msg', resp);
-                    GamesService.getGame(gameId, true).then(game => {
-                        socket.emit('game', game);
-                    });
                 }
             }).catch(error => {
                 socket.emit('error_msg', error);
             });
         });
+
+        /** Submit selection. Broadcast. */
+        socket.on('submit-selection', data => {
+            console.log(`${gameId}: ${playerId} submitted selection`)
+            const selection = data.selection;
+            GameActionsService.submitSelection(gameId, playerId, selection).then(([statusCode, resp]) => {
+                if (statusCode == 200) {
+                    io.to(gameId).emit('game', resp);
+                } else {
+                    socket.emit('error_msg', resp);
+                }
+            })
+        })
     });
 }
