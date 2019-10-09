@@ -18,7 +18,7 @@ FAILED_VOTES_TO_LOSE = 5;
 
 exports.startGame = async function(gameId) {
     
-    let game = await GameService.getGame(gameId);
+    let game = (await GameService.getGame(gameId))[1];
 
     // check in lobby phase
     if (game.phase != GamePhaseEnum.lobby) {
@@ -61,14 +61,14 @@ exports.startGame = async function(gameId) {
     game.phase = GamePhaseEnum.selection;
 
     // update game
-    let updatedGame = await GameService.updateGame(game.toObject());
+    let updatedGame = (await GameService.updateGame(game.id, game.toObject()))[1];
 
     return [200, updatedGame];
 }
 
 
 exports.endGame = async function(gameId, playerId) {
-    let game = await GameService.getGame(gameId);
+    let game = (await GameService.getGame(gameId))[1];
 
     if (!game) {
         return [400, "Game does not exist"];
@@ -78,15 +78,13 @@ exports.endGame = async function(gameId, playerId) {
     game.phase = GamePhaseEnum.lobby;
 
     // update game
-    await GameService.updateGame(game.toObject());
-
-    game = await GameService.getGame(gameId);
+    game = (await GameService.updateGame(game.id, game.toObject()))[1];
 
     return [200, game];
 }
 
 exports.submitSelection = async function(gameId, playerId, selection) {
-    let game = await GameService.getGame(gameId);
+    let game = (await GameService.getGame(gameId))[1];
 
     // confirm in selection phase
     if (game.phase != GamePhaseEnum.selection) {
@@ -116,15 +114,13 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     game.phase = GamePhaseEnum.vote;
 
     // update game
-    await GameService.updateGame(game.toObject());
-
-    game = await GameService.getGame(gameId);
+    game = (await GameService.updateGame(game.id, game.toObject()))[1];
     
     return [200, game];
 }
 
 exports.submitVote = async function(gameId, playerId, playerVote) {
-    let game = await GameService.getGame(gameId);
+    let game = (await GameService.getGame(gameId))[1];
 
     // confirm in vote phase
     if (game.phase != GamePhaseEnum.vote) {
@@ -139,7 +135,7 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
 
     var updatedPlayer = await PlayerService.updatePlayer(player);
 
-    game = await GameService.getGame(gameId);
+    game = (await GameService.getGame(gameId))[1];
 
     // if all players have voted:
     let allVoted = true;
@@ -189,15 +185,13 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
         }
     }
     
-    await GameService.updateGame(game.toObject());
-
-    game = await GameService.getGame(gameId);
+    game = (await GameService.updateGame(game.id, game.toObject()))[1];
     
     return [200, game];
 }
 
 exports.submitQuest = async function(gameId, playerId, playerQuest) {
-    let game = await GameService.getGame(gameId);
+    let game = (await GameService.getGame(gameId))[1];
 
     // check in quest phase
     if (game.phase != GamePhaseEnum.quest){
@@ -273,9 +267,7 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
         }
     }
     
-    await GameService.updateGame(game.toObject());
-
-    let gottenGame = await GameService.getGame(gameId);
+    game = (await GameService.updateGame(game.id, game.toObject()))[1];
     
-    return [200, gottenGame];
+    return [200, game];
 }

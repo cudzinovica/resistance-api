@@ -15,7 +15,8 @@ exports.getGames = async function(query, page, limit) {
 }
 
 exports.getGame = async function(id) {
-    return [200, await Game.findById(id)];
+    const game = await Game.findById(id)
+    return [200, game];
 }
 
 exports.createGame = async function(){
@@ -33,9 +34,7 @@ exports.createGame = async function(){
     return [201, await newGame.save()];
 }
 
-exports.updateGame = async function(game) {
-    const id = game.id;
-
+exports.updateGame = async function(id, game) {
     var oldGame = await Game.findById(id);
 
     for (var [key, value] of Object.entries(game)) {

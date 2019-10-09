@@ -3,8 +3,8 @@ var GamesService = require('../services/games.service');
 var PlayersService = require('../services/players.service');
 
 function getAndBroadcastGame(io, gameId) {
-    GamesService.getGame(gameId, true).then(game => {
-        io.to(gameId).emit('game', game);
+    GamesService.getGame(gameId, true).then(([statusCode, resp]) => {
+        io.to(gameId).emit('game', resp);
     });
 }
 
@@ -45,9 +45,7 @@ module.exports = function(io) {
         /** Start game. Broadcast game to room. */
         socket.on('start-game', _ => {
             console.log(`${playerId} started ${gameId}`);
-            GameActionsService.startGame(gameId).then(rsp => {
-                const [statusCode, resp] = rsp;
-
+            GameActionsService.startGame(gameId).then(([statusCode, resp]) => {
                 if (statusCode == 200) {
                     //broadcst game to room
                     io.to(gameId).emit('game', resp);

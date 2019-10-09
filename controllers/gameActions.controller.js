@@ -9,7 +9,7 @@ exports.startGame = async function(req, res, next) {
         const [statusCode, game] = await GameActionsService.startGame(gameId);
         return res.status(statusCode).json(game);
     } catch(e) {
-        return res.status(statusCode).json(e.message);
+        return res.status(500).json(e.message);
     }
 
 }
@@ -23,7 +23,7 @@ exports.endGame = async function(req, res, next) {
         return res.status(statusCode).json(game);
 
     } catch(e) {
-        return res.status(statusCode).json(e.message);
+        return res.status(500).json(e.message);
     }
 }
 
@@ -37,7 +37,7 @@ exports.submitSelection = async function(req, res, next) {
         return res.status(statusCode).json(game);
 
     } catch(e) {
-        return res.status(statusCode).json(e.message);
+        return res.status(500).json(e.message);
     }
 }
 
@@ -51,7 +51,7 @@ exports.submitVote = async function(req, res, next) {
 
         return res.status(statusCode).json(game);
     } catch(e) {
-        return res.status(statusCode).json(e.message);
+        return res.status(500).json(e.message);
     }
 }
 
@@ -65,6 +65,6 @@ exports.submitQuest = async function(req, res, next) {
         
         return res.status(statusCode).json(game);
     } catch(e) {
-        return res.status(statusCode).json(e.message);
+        return res.status(500).json(e.message);
     }
 }
