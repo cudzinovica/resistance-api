@@ -16,9 +16,9 @@ teamSizeMap = {
 };
 FAILED_VOTES_TO_LOSE = 5;
 
-exports.startGame = async function(gameId) {
+exports.startGame = async function(roomCode) {
     
-    let game = (await GameService.getGame(gameId))[1];
+    let game = (await GameService.getGame(roomCode))[1];
 
     // check in lobby phase
     if (game.phase != GamePhaseEnum.lobby) {
@@ -61,14 +61,14 @@ exports.startGame = async function(gameId) {
     game.phase = GamePhaseEnum.selection;
 
     // update game
-    let updatedGame = (await GameService.updateGame(game.id, game.toObject()))[1];
+    let updatedGame = (await GameService.updateGame(game.roomCode, game.toObject()))[1];
 
     return [200, updatedGame];
 }
 
 
-exports.endGame = async function(gameId, playerId) {
-    let game = (await GameService.getGame(gameId))[1];
+exports.endGame = async function(roomCode, playerId) {
+    let game = (await GameService.getGame(roomCode))[1];
 
     if (!game) {
         return [400, "Game does not exist"];
@@ -78,13 +78,13 @@ exports.endGame = async function(gameId, playerId) {
     game.phase = GamePhaseEnum.lobby;
 
     // update game
-    game = (await GameService.updateGame(game.id, game.toObject()))[1];
+    game = (await GameService.updateGame(game.roomCode, game.toObject()))[1];
 
     return [200, game];
 }
 
-exports.submitSelection = async function(gameId, playerId, selection) {
-    let game = (await GameService.getGame(gameId))[1];
+exports.submitSelection = async function(roomCode, playerId, selection) {
+    let game = (await GameService.getGame(roomCode))[1];
 
     // confirm in selection phase
     if (game.phase != GamePhaseEnum.selection) {
@@ -114,13 +114,13 @@ exports.submitSelection = async function(gameId, playerId, selection) {
     game.phase = GamePhaseEnum.vote;
 
     // update game
-    game = (await GameService.updateGame(game.id, game.toObject()))[1];
+    game = (await GameService.updateGame(game.roomCode, game.toObject()))[1];
     
     return [200, game];
 }
 
-exports.submitVote = async function(gameId, playerId, playerVote) {
-    let game = (await GameService.getGame(gameId))[1];
+exports.submitVote = async function(roomCode, playerId, playerVote) {
+    let game = (await GameService.getGame(roomCode))[1];
 
     // confirm in vote phase
     if (game.phase != GamePhaseEnum.vote) {
@@ -135,8 +135,8 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
     player.hasVoted = true;
 
     // update and retrieve game to minimize chance for missing other players' updates
-    await GameService.updateGame(game.id, game.toObject());
-    game = (await GameService.getGame(gameId))[1];
+    await GameService.updateGame(game.roomCode, game.toObject());
+    game = (await GameService.getGame(roomCode))[1];
 
     // if all players have voted:
     let allVoted = game.players.every(player => player.hasVoted);
@@ -179,13 +179,13 @@ exports.submitVote = async function(gameId, playerId, playerVote) {
         }
     }
     
-    game = (await GameService.updateGame(game.id, game.toObject()))[1];
+    game = (await GameService.updateGame(game.roomCode, game.toObject()))[1];
     
     return [200, game];
 }
 
-exports.submitQuest = async function(gameId, playerId, playerQuest) {
-    let game = (await GameService.getGame(gameId))[1];
+exports.submitQuest = async function(roomCode, playerId, playerQuest) {
+    let game = (await GameService.getGame(roomCode))[1];
 
     // check in quest phase
     if (game.phase != GamePhaseEnum.quest){
@@ -205,8 +205,8 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
     player.hasQuested = true;
 
     // update and retrieve game to minimize chance for missing other players' updates
-    await GameService.updateGame(game.id, game.toObject());
-    game = (await GameService.getGame(gameId))[1];
+    await GameService.updateGame(game.roomCode, game.toObject());
+    game = (await GameService.getGame(roomCode))[1];
 
     // if all players have quested:
     let allQuested = game.currentTeam.every(playerId => game.players.find(player => player.id === playerId).hasQuested);
@@ -259,7 +259,7 @@ exports.submitQuest = async function(gameId, playerId, playerQuest) {
         }
     }
     
-    game = (await GameService.updateGame(game.id, game.toObject()))[1];
+    game = (await GameService.updateGame(game.roomCode, game.toObject()))[1];
     
     return [200, game];
 }

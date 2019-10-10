@@ -3,8 +3,8 @@ var Game = require('../models/game.model');
 _this = this;
 
 
-exports.getPlayers = async function(gameId){
-    const game = await Game.findById(gameId)
+exports.getPlayers = async function(gameCode){
+    const game = await Game.findOne({ roomCode: gameCode });
     if( !game ){
         return [404, 'Game not found'];
     }
@@ -12,8 +12,8 @@ exports.getPlayers = async function(gameId){
     return [200, players];
 }
 
-exports.getPlayer = async function(gameId, playerId){
-    const game = await Game.findById(gameId)
+exports.getPlayer = async function(gameCode, playerId){
+    const game = await Game.findOne({ roomCode: gameCode });
     if( !game ){
         return [404, 'Game not found'];
     }
@@ -25,8 +25,8 @@ exports.getPlayer = async function(gameId, playerId){
     return [200, player];
 }
 
-exports.createPlayer = async function(gameId, player){
-    const game = await Game.findById(gameId)
+exports.createPlayer = async function(gameCode, player){
+    const game = await Game.findOne({ roomCode: gameCode });
     if( !game ){
         return [404, 'Game not found'];
     }
@@ -49,8 +49,8 @@ exports.createPlayer = async function(gameId, player){
     return [201, playerId];
 }
 
-exports.updatePlayer = async function(gameId, newPlayer){
-    let game = await Game.findById(gameId);
+exports.updatePlayer = async function(gameCode, newPlayer){
+    let game = await Game.findOne({ roomCode: gameCode });
     if( !game ){
         return [404, 'Game not found'];
     }
@@ -66,8 +66,8 @@ exports.updatePlayer = async function(gameId, newPlayer){
     return [201, player];
 }
 
-exports.deletePlayer = async function(gameId, playerId){
-    let game = await Game.findById(gameId);
+exports.deletePlayer = async function(gameCode, playerId){
+    let game = await Game.findOne({ roomCode: gameCode });
     if( !game ){
         return [404, 'Game not found'];
     }

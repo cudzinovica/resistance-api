@@ -5,6 +5,7 @@ var mongoosePaginate = require('mongoose-paginate');
 var PlayerSchema = require('./player.schema');
 
 const GameSchema = Schema({
+    roomCode: String,
     phase: Number,
     players: [PlayerSchema],
     currentLeaderIdx: Number,
