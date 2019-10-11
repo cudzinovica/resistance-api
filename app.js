@@ -20,7 +20,7 @@ var app = express();
 
 // sockets.io
 const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, { origins: '*:*' });
 server.listen(4000);
 require('./sockets/sockets')(io);
 
