@@ -1,9 +1,3 @@
-const MONGODB_HOST = "ds333248.mlab.com";
-const MONGODB_PORT = "33248";
-const MONGODB_DBNAME = "heroku_3gqsvj8b";
-const MONGODB_USER = "user";
-const MONGODB_PASSWORD = "password0";
-
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
@@ -21,10 +15,10 @@ var app = express();
 // mongoose
 var mongoose = require('mongoose')
 mongoose.Promise = bluebird
-mongodb_url = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DBNAME}`
-mongoose.connect(mongodb_url, { useNewUrlParser: true })
-    .then(()=> { console.log(`Succesfully Connected to the Mongodb Database  at URL : ${mongodb_url}`)})
-    .catch(()=> { console.log(`Error Connecting to the Mongodb Database at URL : ${mongodb_url}`)})
+console.log(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
+    .then(()=> { console.log(`Succesfully Connected to the Mongodb Database  at URL : ${process.env.MONGODB_URI}`)})
+    .catch(()=> { console.log(`Error Connecting to the Mongodb Database at URL : ${process.env.MONGODB_URI}`)})
 
 // CORS
 app.use(function(req, res, next) {
