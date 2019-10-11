@@ -26,7 +26,7 @@ module.exports = function(io) {
 
         /** Set socket's player id. Join socket to game room. Broadcast game to room. Emit player id to socket.*/
         socket.on('join-game', data => {
-            roomCode = data.roomCode;
+            roomCode = data.roomCode.toLowerCase();
             playerId = data.playerId;
 
             console.log(`${roomCode}: ${playerId} joined the game`)
