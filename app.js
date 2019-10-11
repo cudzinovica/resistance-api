@@ -18,22 +18,6 @@ var bluebird = require('bluebird')
 
 var app = express();
 
-// sockets.io
-const server = require('http').Server(app);
-const io = require('socket.io')(server, {
-    handlePreflightRequest: (req, res) => {
-        const headers = {
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": true
-        };
-        res.writeHead(200, headers);
-        res.end();
-    }
-});
-server.listen(4000);
-require('./sockets/sockets')(io);
-
 // mongoose
 var mongoose = require('mongoose')
 mongoose.Promise = bluebird
@@ -55,8 +39,6 @@ app.use(function(req, res, next) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
