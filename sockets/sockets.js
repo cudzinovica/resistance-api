@@ -21,7 +21,7 @@ module.exports = function(io) {
 
         socket.on('disconnect', _ => {
             console.log(`${roomCode}: ${playerId} disconnected`);
-            deletePlayerAndBroadcastGame(io, roomCode, playerId);
+            // deletePlayerAndBroadcastGame(io, roomCode, playerId);
         });
 
         /** Set socket's player id. Join socket to game room. Broadcast game to room. Emit player id to socket.*/
@@ -35,6 +35,15 @@ module.exports = function(io) {
 
             getAndBroadcastGame(io, roomCode);
         });
+
+        /** Leave socket from game room. Broadcast game to room. */
+        socket.on('leave-game', _ => {
+            console.log(`${roomCode}: ${playerId} left the game`);
+
+            socket.leave();
+
+            getAndBroadcastGame(io, roomCode);
+        })
 
         /** Start game. Broadcast game to room. */
         socket.on('start-game', _ => {
