@@ -45,6 +45,15 @@ module.exports = function(io) {
             getAndBroadcastGame(io, roomCode);
         })
 
+        /** Broadcast message for player with player id to leave the room. Broadcast game to room. */
+        socket.on('kick-player', data => {
+            console.log(`${roomCode}: ${data.playerId} has been kicked from the game`);
+            
+            io.to(roomCode).emit('kick-player', data.playerId);
+
+            getAndBroadcastGame(io, roomCode);
+        })
+
         /** Start game. Broadcast game to room. */
         socket.on('start-game', _ => {
             console.log(`${roomCode}: ${playerId} started the game`);
