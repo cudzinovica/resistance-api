@@ -7,7 +7,7 @@ router.use('/:gameId/players', players);
 
 var GameController = require('../../controllers/games.controller');
 
-router.get('/', GameController.getGames)
+// router.get('/', GameController.getGames)
 router.get('/:id', GameController.getGame)
 router.post('/', GameController.createGame)
 router.put('/:id', GameController.updateGame)
