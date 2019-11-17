@@ -16,12 +16,13 @@ function deletePlayerAndBroadcastGame(io, roomCode, playerId) {
 
 module.exports = function(io) {
     io.on('connection', socket => {
+        console.log('socket connected');
+        
         let roomCode;
         let playerId;
 
         socket.on('disconnect', _ => {
             console.log(`${roomCode}: ${playerId} disconnected`);
-            // deletePlayerAndBroadcastGame(io, roomCode, playerId);
         });
 
         /** Set socket's player id. Join socket to game room. Broadcast game to room. Emit player id to socket.*/
