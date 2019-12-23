@@ -39,12 +39,17 @@ exports.startGame = async function(roomCode) {
     game.currentTeam = [];
     game.winningTeam = null;
 
-    // assign players' loyalties
+    // reset players' attributes and assign players' loyalties
     let numEvil = Math.ceil(numPlayers / 3)
     for (var i = 0; i < game.players.length; i++) {
         let player = game.players[i];
-        const rand = Math.floor(Math.random() * numPlayers);
 
+        player.currentVote = false;
+        player.hasVoted = false;
+        player.currentQuest = false;
+        player.hasQuested = false;
+        
+        const rand = Math.floor(Math.random() * numPlayers);
         if( rand < numEvil ) {
             player.loyalty = LoyaltyEnum.evil;
             numEvil--;
