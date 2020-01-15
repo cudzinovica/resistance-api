@@ -16,17 +16,26 @@ function deletePlayerAndBroadcastGame(io, roomCode, playerId) {
 
 module.exports = function(io) {
     io.on('connection', socket => {
+        console.log('socket connected');
+
         let roomCode;
         let playerId;
 
-        socket.on('disconnect', _ => {
-            console.log(`${roomCode}: ${playerId} disconnected`);
-            deletePlayerAndBroadcastGame(io, roomCode, playerId);
+        socket.on('disconnect', (reason) => {
+            console.log(`${roomCode}: ${playerId} disconnected because: ${reason}`);
         });
+
+        socket.on('reconnect', (attemptNumber) => {
+            console.log(`${roomCode}: ${playerId} reconnected. attempts: ${attemptNumber}`);
+        })
+
+        socket.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`${roomCode}: ${playerId} reconnect attempt number: ${attemptNumber}`);
+        })
 
         /** Set socket's player id. Join socket to game room. Broadcast game to room. Emit player id to socket.*/
         socket.on('join-game', data => {
-            roomCode = data.roomCode;
+            roomCode = data.roomCode.toLowerCase();
             playerId = data.playerId;
 
             console.log(`${roomCode}: ${playerId} joined the game`)
@@ -35,6 +44,24 @@ module.exports = function(io) {
 
             getAndBroadcastGame(io, roomCode);
         });
+
+        /** Leave socket from game room. Broadcast game to room. */
+        socket.on('leave-game', _ => {
+            console.log(`${roomCode}: ${playerId} left the game`);
+
+            socket.leave();
+
+            getAndBroadcastGame(io, roomCode);
+        })
+
+        /** Broadcast message for player with player id to leave the room. Broadcast game to room. */
+        socket.on('kick-player', data => {
+            console.log(`${roomCode}: ${data.playerId} has been kicked from the game`);
+            
+            io.to(roomCode).emit('kick-player', data.playerId);
+
+            getAndBroadcastGame(io, roomCode);
+        })
 
         /** Start game. Broadcast game to room. */
         socket.on('start-game', _ => {
