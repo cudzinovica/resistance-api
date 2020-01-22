@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
 });
 
 // Scheduled functions
-schedule.scheduleJob('* * 1 * *', () => scheduled.deleteOldGames);
+schedule.scheduleJob('0 0 * * *', () => scheduled.deleteOldGames);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
