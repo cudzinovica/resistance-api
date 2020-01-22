@@ -8,7 +8,10 @@ var index = require('./routes/index.route');
 var users = require('./routes/users.route');
 var api = require('./routes/api.route');
 
-var bluebird = require('bluebird')
+var bluebird = require('bluebird');
+
+var schedule = require('node-schedule');
+var scheduled = require('./scheduled/scheduled');
 
 var app = express();
 
@@ -28,6 +31,8 @@ app.use(function(req, res, next) {
     next();
 });
 
+// Scheduled functions
+schedule.scheduleJob('* * 1 * *', () => scheduled.deleteOldGames);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

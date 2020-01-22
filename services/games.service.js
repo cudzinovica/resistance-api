@@ -42,7 +42,8 @@ exports.createGame = async function(){
         currentRound: 0,
         currentLeaderIdx: null,
         currentTeam: [],
-        winningTeam: null
+        winningTeam: null,
+        creationTime: Date.now(),
     })
 
     return [201, await newGame.save()];
