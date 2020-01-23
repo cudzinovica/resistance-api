@@ -13,7 +13,8 @@ const GameSchema = Schema({
     failedVotes: Number,
     currentRound: Number,
     currentTeam: [{type: String}],
-    winningTeam: Boolean
+    winningTeam: Boolean,
+    creationTime: Date,
 });
 
 GameSchema.plugin(mongoosePaginate);

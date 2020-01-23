@@ -1,5 +1,5 @@
 # resistance-api
-API for the resistance made with NodeJS, ExpressJS and MongoDB. Has CRUD functionality for interacting with game and player objects.
+API for [the resistance](https://github.com/cudzinovica/resistance) made with NodeJS, ExpressJS and MongoDB. Has CRUD functionality for interacting with game and player objects.
 
 ## Database Setup
 
